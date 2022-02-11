@@ -14,11 +14,20 @@ from django.shortcuts import render
 def homePageView(request):
 
     if request.method == "POST":
-        x = int(request.POST['side'])
+        #x = int(request.POST['side'])
+        a = int(request.POST['a_side'])
+        b = int(request.POST['b_side'])
+        c = int(request.POST['c_side'])
+
     else:
-        x = 5
+        #x = 5
+        a = 5
+        b = 4
+        c = 3
     
-    my_square = Square(x)
+    #my_square = Square(x)
+    #my_square = Rectangle(a,b)
+    my_square = Triangle(a,b,c)
     figure = my_square.plot()
     context = {"type": my_square.title, "params": my_square.input.items(), "results": my_square.output.items(), "picture": figure}
 

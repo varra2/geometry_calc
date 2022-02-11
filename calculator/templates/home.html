@@ -4,6 +4,7 @@
 
 <form action="" method="post">
     {% csrf_token %}
+    <input type = "hidden" value = "{{ title }}">
     {% for parametr, value in params %}
         {{ parametr.0 }}: <input type="text" name = "{{ parametr.1 }}" value="{{ value }}">
     {% endfor %}
