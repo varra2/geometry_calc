@@ -11,9 +11,10 @@ class Figure:
         title = None
 
 class Square(Figure):
+    title = 'Квадрат'
     def __init__(self, a):
         super().__init__()
-        self.title = 'Квадрат'
+        #self.title = 'Квадрат'
         self.input[('Сторона', 'side')] = a
         self.output[('Периметр', 'perimeter')] = a*4
         self.output[('Площадь', 'square')] = a ** 2
@@ -33,5 +34,7 @@ class Square(Figure):
         #plt.savefig('example.png')
 
 
-myfig = Square(10)
-myfig.plot()
+#myfig = Square(10)
+#myfig.plot()
+
+print([(cls.title, cls) for cls in Figure.__subclasses__()])

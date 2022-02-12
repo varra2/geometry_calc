@@ -13,23 +13,30 @@ from django.shortcuts import render
 
 def homePageView(request):
 
-    if request.method == "POST":
-        #x = int(request.POST['side'])
-        a = int(request.POST['a_side'])
-        b = int(request.POST['b_side'])
-        c = int(request.POST['c_side'])
+    classes = Figure.get_types()
+    fig = classes[0][1]
+    t = None
 
-    else:
-        #x = 5
-        a = 5
-        b = 4
-        c = 3
-    
+    if request.method == "GET":
+        print(request.GET.get('type',''))
+        for type in classes:
+            if type[0] == request.GET.get('type',''):
+                fig = type[1]
+
+    if request.method == "POST":
+        for type in classes:
+            if type[0] == request.POST['title']:
+                fig = type[1]
+        t = [int(request.POST[item]) for item in request.POST if not (item == 'csrfmiddlewaretoken' or item =='title')] 
+
     #my_square = Square(x)
-    #my_square = Rectangle(a,b)
-    my_square = Triangle(a,b,c)
+    if t:
+        my_square = fig(*t)
+    else:
+        my_square = fig()
+    #my_square = Triangle()
     figure = my_square.plot()
-    context = {"type": my_square.title, "params": my_square.input.items(), "results": my_square.output.items(), "picture": figure}
+    context = {"classes": my_square.get_types() ,"type": my_square.title, "params": my_square.input.items(), "results": my_square.output.items(), "picture": figure}
 
     return render(request, "home.html", context=context)
 

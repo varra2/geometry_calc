@@ -1,10 +1,17 @@
 <html>
 <h1>Калькулятор</h1>
+
+{% for class in classes %}
+<a href="http://localhost:8000/?type={{ class.0 }}">{{ class.0 }}</a>
+{% endfor %}
+
 <h2>Фигура: {{ type }}</h2> 
 
+
+<br><br>
 <form action="" method="post">
+    <input type = "hidden" name="title" value="{{ type }}">
     {% csrf_token %}
-    <input type = "hidden" value = "{{ title }}">
     {% for parametr, value in params %}
         {{ parametr.0 }}: <input type="text" name = "{{ parametr.1 }}" value="{{ value }}">
     {% endfor %}
