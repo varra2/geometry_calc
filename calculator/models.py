@@ -140,3 +140,39 @@ class Triangle(Figure):
         def plot(self):
             return super().plot(self.coords)
         
+class Trapezoid(Figure):
+    title = 'Трапеция'
+    metrics = (('Периметр', 'perimeter'), ('Площадь', 'square'))
+    
+    def __init__(self, a=5, b=4, c=3, h=3):
+            super().__init__()
+            self.input = {('Нижнее основание', 'low_base'): a, ('Боковая сторона', 'side'): b, ('Верхнее основание', 'high_base'): c, ('Высота', 'hight'): h}
+            leg = np.sqrt(b**2 - h**2)
+            check = self.check_edge(leg,h,b)
+            if not check:
+                d = np.sqrt((a - leg)**2 + h**2)
+                self.sides = [a,b,c,d]
+                super().calculate()
+                self.coords = self.get_coords()
+            else:
+                self.coords = super().coords
+                self.output[('Ошибка','error')] = check
+
+    @staticmethod
+    def check_edge(leg, hight, side):
+        if hight > side:
+            return 'длина высоты не может превышать длину боковой стороны. Пожалуйста, попробуйте ещё раз с другими входными данными.'
+        else:
+            return Triangle.triangle_rule(leg,hight,side)
+
+    def get_coords(self):
+        a,b,c = self.sides[:3]
+        h = self.input[('Высота', 'hight')]
+        return ((0,0), (np.sqrt(b**2 - h**2), h), (c + np.sqrt(b**2 - h**2), h), (a,0), (0,0))
+
+    def square(self):
+        base1, base2, h = self.input[('Нижнее основание', 'low_base')], self.input[('Верхнее основание', 'high_base')], self.input[('Высота', 'hight')] 
+        self.output[('Площадь', 'square')] = (base1 + base2)*h/2
+        
+    def plot(self):
+            return super().plot(self.coords)
