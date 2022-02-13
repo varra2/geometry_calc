@@ -24,6 +24,8 @@ class Figure():
             self.square()
         if ('Высота', 'hight') in self.metrics:
             self.hight()
+        if ('Сторона','side') in self.metrics:
+            self.get_sides()
 
     def perimeter(self):
         self.output[('Периметр', 'perimeter')] = sum(self.sides)
@@ -32,6 +34,9 @@ class Figure():
         pass
 
     def hight(self):
+        pass
+
+    def get_sides(self):
         pass
 
     @classmethod
@@ -120,7 +125,7 @@ class Triangle(Figure):
             return h
 
         def square(self):            
-            self.output[('Площадь', 'square')] = self.sides[0] * self.hight()
+            self.output[('Площадь', 'square')] = (self.sides[0] * self.hight())/2
 
         def get_coords(self):
             a,b = self.sides[0], self.sides[1]
@@ -174,5 +179,33 @@ class Trapezoid(Figure):
         base1, base2, h = self.input[('Нижнее основание', 'low_base')], self.input[('Верхнее основание', 'high_base')], self.input[('Высота', 'hight')] 
         self.output[('Площадь', 'square')] = (base1 + base2)*h/2
         
+    def plot(self):
+            return super().plot(self.coords)
+
+class Rhomb(Figure):
+    title = 'Ромб'
+    metrics = (('Периметр', 'perimeter'), ('Площадь', 'square'), ('Сторона','side'))
+
+    def __init__(self, d1=5, d2=3):
+            super().__init__()
+            self.input = {('Большая диагональ', 'bg_diagonal'): max(d1, d2), ('Малая диагональ', 'sm_diagonal'): min(d1,d2)}
+            self.sides = self.get_sides()
+            super().calculate()
+            self.coords = self.get_coords()
+
+    def get_sides(self):
+        d1, d2 = self.input.values()
+        self.output[('Сторона','side')] = np.sqrt((d1/2)**2 + (d2/2)**2)
+        return [np.sqrt((d1/2)**2 + (d2/2)**2)]*4
+
+    def square(self):
+        a,b,c = self.output[('Сторона','side')], self.input[('Большая диагональ', 'bg_diagonal')], self.input[('Малая диагональ', 'sm_diagonal')]
+        triangle = Triangle(b/2,c/2,a)
+        self.output[('Площадь', 'square')] = triangle.output[('Площадь', 'square')]*4
+
+    def get_coords(self):
+        d1, d2 = self.input.values()
+        return ((0, d1/2), (d2/2, d1),(d2, d1/2), (d2/2,0), (0, d1/2))
+
     def plot(self):
             return super().plot(self.coords)
