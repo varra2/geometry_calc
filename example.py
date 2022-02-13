@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import io
 from PIL import Image
 import base64
+import numpy as np
 
 class Figure:
     input = dict()
@@ -46,18 +47,22 @@ class Square(Figure):
         self.output[('Площадь', 'square')] = self.input[('Сторона', 'side')] ** 2
 
     def plot(self):
-        a = self.input[('Сторона', 'side')]
+        rd = self.input[('Сторона', 'side')]
         fig = plt.figure()
         ax = plt.subplot(111)
         ax.set_aspect('equal')
-        ax.plot([0,a,a,0,0],[0,0,a,a,0])
+        x = np.linspace(0,44,int(np.ceil(500*rd)))
+        ax.plot(x,np.sqrt(rd**2-x**2),'k')
+        ax.plot(x,-np.sqrt(rd**2-x**2),'k')
+        #nw = np.delete(x, [i for i in range(len(x)) if abs(x[i])>np.sqrt((3*rd**2)/4)])
+        #ax.plot(x,np.sqrt(rd**2-x**2),'k')
         buf = io.BytesIO()
         plt.savefig(buf, format='png')
+        plt.savefig('example.png')
         buf.seek(0)
         thumb_data = base64.b64encode(buf.read()).decode('utf-8') 
         print(thumb_data)
         buf.close()
-        #plt.savefig('example.png')
 
 class Nriangle(Figure):
     title = 'Треугольник'

@@ -48,7 +48,7 @@ class Figure():
             plt.figure()
             ax = plt.subplot(111)
             ax.set_aspect('equal')
-            ax.plot([coord[0] for coord in coords],[coord[1] for coord in coords])
+            ax.plot([coord[0] for coord in coords],[coord[1] for coord in coords], color='teal')
             buf = io.BytesIO()
             plt.savefig(buf, format='png')
             buf.seek(0)
@@ -147,7 +147,7 @@ class Triangle(Figure):
         
 class Trapezoid(Figure):
     title = 'Трапеция'
-    metrics = (('Периметр', 'perimeter'), ('Площадь', 'square'))
+    metrics = (('Периметр', 'perimeter'), ('Площадь', 'square'), ('Сторона','side'))
     
     def __init__(self, a=5, b=4, c=3, h=3):
             super().__init__()
@@ -179,6 +179,9 @@ class Trapezoid(Figure):
         base1, base2, h = self.input[('Нижнее основание', 'low_base')], self.input[('Верхнее основание', 'high_base')], self.input[('Высота', 'hight')] 
         self.output[('Площадь', 'square')] = (base1 + base2)*h/2
         
+    def get_sides(self):
+        self.output[('Вторая боковая сторона','side')] = self.sides[-1]
+
     def plot(self):
             return super().plot(self.coords)
 
@@ -209,3 +212,35 @@ class Rhomb(Figure):
 
     def plot(self):
             return super().plot(self.coords)
+
+class Circle(Figure):
+    title = 'Круг'
+    metrics = (('Периметр', 'perimeter'), ('Площадь', 'square'))
+
+    def __init__(self, r=5):
+        super().__init__()
+        self.input = {('Радиус','radius'): r}
+        super().calculate()
+
+    def perimeter(self):
+        self.output[('Периметр', 'perimeter')] = 2 * self.input[('Радиус','radius')] * np.pi
+
+    def square(self):
+        self.output[('Площадь', 'square')] = np.pi * self.input[('Радиус','radius')]**2
+
+    def plot(self):
+        plt.figure()
+        ax = plt.subplot(111)
+        ax.set_aspect('equal')
+        rd = self.input[('Радиус','radius')]
+        x = np.linspace(0,rd*2,int(np.ceil(500*rd)))
+        ax.plot(x, (np.sqrt(rd**2-(x-rd)**2) + rd), color='teal')
+        ax.plot(x, (-np.sqrt(rd**2-(x-rd)**2) + rd), color='teal')
+        buf = io.BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
+        thumb_data = base64.b64encode(buf.read()).decode('utf-8') 
+        buf.close()
+        return thumb_data
+
+
