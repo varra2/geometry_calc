@@ -14,6 +14,7 @@ from django.shortcuts import render
 def homePageView(request):
 
     classes = Figure.get_types()
+    print(classes)
     fig = classes[0][1]
     t = None
 
@@ -36,7 +37,7 @@ def homePageView(request):
         my_square = fig()
     #my_square = Triangle()
     figure = my_square.plot()
-    context = {"classes": my_square.get_types() ,"type": my_square.title, "params": my_square.input.items(), "results": my_square.output.items(), "picture": figure}
+    context = {"classes": classes ,"type": my_square.title, "params": my_square.input.items(), "results": my_square.output.items(), "picture": figure}
 
     return render(request, "home.html", context=context)
 
