@@ -7,7 +7,7 @@ import numpy as np
 
 class Figure():
     metrics = set()
-    coords = ((1,1))
+    coords = ((1,1),(1,1))
 
     def __init__(self):
             self.input = dict()
@@ -105,8 +105,12 @@ class Triangle(Figure):
             super().__init__()
             self.input = {('Сторона А', 'a_side'): a, ('Сторона Б', 'b_side'): b, ('Сторона В', 'c_side'): c}
             self.sides = [a,b,c]
-            super().calculate()
-            self.coords = self.get_coords()
+            if not self.triangle_rule(a,b,c):
+                super().calculate()
+                self.coords = self.get_coords()
+            else:
+                self.output[('Ошибка','error')] = self.triangle_rule(a,b,c)
+                self.coords = super().coords
 
         def hight(self):
             a,b,c = self.sides[:]
@@ -122,6 +126,16 @@ class Triangle(Figure):
             a,b = self.sides[0], self.sides[1]
             h = self.output[('Высота', 'hight')]
             return ((0,0), (a,0), (np.sqrt(b**2-h**2), h), (0,0))
+
+        @staticmethod
+        def triangle_rule(a,b,c):
+            sides = [a,b,c]
+            for i in range(3):
+                rest = sum(sides[:i]+sides[i+1:])
+                if sides[i] >= rest:
+                    line = f'введённые Вами стороны не проходят проверку на соотношение сторон: длина стороны {sides[i]} беольше либо равна сумме длин других сторон {rest}. Пожалуйста, попробуйте ещё раз с другими значениями.'
+                    return line
+            return False 
 
         def plot(self):
             return super().plot(self.coords)
