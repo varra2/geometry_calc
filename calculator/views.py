@@ -13,7 +13,7 @@ from django.shortcuts import render
 
 def homePageView(request):
 
-    classes = Figure.get_types()
+    classes = Flat.get_types()+Volumetric.get_types()
     print(classes)
     fig = classes[0][1]
     t = None

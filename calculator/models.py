@@ -26,6 +26,8 @@ class Figure():
             self.hight()
         if ('Сторона','side') in self.metrics:
             self.get_sides()
+        if ('Объём','volume') in self.metrics:
+            self.volume()
 
     def perimeter(self):
         self.output[('Периметр', 'perimeter')] = sum(self.sides)
@@ -39,26 +41,54 @@ class Figure():
     def get_sides(self):
         pass
 
+    def volume(self):
+        pass
+
     @classmethod
     def get_types(cls):
         #return (('Квадрат','square'),('Круг','circle'),('Прямоугольник','rectangle'),('Треугольник','triangle'),('Трапеция','trapezoid'),('Ромб','rhomb'),('Сфера','sphere'),('Параллелепипед','paralellepiped'),('Цилиндр','cylinder'),('Конус','cone'))
         return [(shape.title, shape) for shape in cls.__subclasses__()]
 
+class Flat(Figure):
+    title = 'Плоские фигуры'
+    coords = ((1,1),(1,1))
+
+    @classmethod
+    def get_types(cls):
+        return super().get_types()
+
     def plot(sef, coords=coords):
-            plt.figure()
-            ax = plt.subplot(111)
-            ax.set_aspect('equal')
-            ax.plot([coord[0] for coord in coords],[coord[1] for coord in coords], color='teal')
-            buf = io.BytesIO()
-            plt.savefig(buf, format='png')
-            buf.seek(0)
-            thumb_data = base64.b64encode(buf.read()).decode('utf-8') 
-            buf.close()
-            return thumb_data
+        plt.figure()
+        ax = plt.subplot(111)
+        ax.set_aspect('equal')
+        ax.plot([coord[0] for coord in coords],[coord[1] for coord in coords], color='teal')
+        buf = io.BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
+        thumb_data = base64.b64encode(buf.read()).decode('utf-8') 
+        buf.close()
+        return thumb_data
 
+class Volumetric(Figure):
+    title = 'Объёмные фигуры'
+    coords = ((1,1,1),(1,1,1))
 
+    @classmethod
+    def get_types(cls):
+        return super().get_types()
 
-class Square(Figure):
+    def plot(sef, coords=coords):
+        fig = plt.figure()
+        ax = fig.add_subplot(projection='3d')
+        ax.plot([coord[0] for coord in coords],[coord[1] for coord in coords], [coord[2] for coord in coords], color='teal')
+        buf = io.BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
+        thumb_data = base64.b64encode(buf.read()).decode('utf-8') 
+        buf.close()
+        return thumb_data
+
+class Square(Flat):
     title = 'Квадрат'
     metrics = (('Периметр', 'perimeter'), ('Площадь', 'square'))
 
@@ -80,7 +110,7 @@ class Square(Figure):
     def plot(self):
         return super().plot(self.coords)
 
-class Rectangle(Figure):
+class Rectangle(Flat):
         title = 'Прямоугольник'
         metrics = (('Периметр', 'perimeter'), ('Площадь', 'square'))
         
@@ -102,7 +132,7 @@ class Rectangle(Figure):
         def plot(self):
             return super().plot(self.coords)
 
-class Triangle(Figure):
+class Triangle(Flat):
         title = 'Треугольник'
         metrics = (('Периметр', 'perimeter'), ('Площадь', 'square'), ('Высота', 'hight'))
 
@@ -145,7 +175,7 @@ class Triangle(Figure):
         def plot(self):
             return super().plot(self.coords)
         
-class Trapezoid(Figure):
+class Trapezoid(Flat):
     title = 'Трапеция'
     metrics = (('Периметр', 'perimeter'), ('Площадь', 'square'), ('Сторона','side'))
     
@@ -185,7 +215,7 @@ class Trapezoid(Figure):
     def plot(self):
             return super().plot(self.coords)
 
-class Rhomb(Figure):
+class Rhomb(Flat):
     title = 'Ромб'
     metrics = (('Периметр', 'perimeter'), ('Площадь', 'square'), ('Сторона','side'))
 
@@ -213,7 +243,7 @@ class Rhomb(Figure):
     def plot(self):
             return super().plot(self.coords)
 
-class Circle(Figure):
+class Circle(Flat):
     title = 'Круг'
     metrics = (('Периметр', 'perimeter'), ('Площадь', 'square'))
 
@@ -243,4 +273,26 @@ class Circle(Figure):
         buf.close()
         return thumb_data
 
+class Cube(Volumetric):
+    title = 'Куб'
+    metrics = (('Периметр', 'perimeter'), ('Площадь', 'square'), ('Объём','volume'))
 
+    def __init__(self, a=5):
+        super().__init__()
+        self.input[('Сторона', 'side')] = a
+        self.sides = [a]*12
+        super().calculate()
+        self.coords = self.get_coords()
+
+    def get_coords(self):
+        a = self.input[('Сторона', 'side')]
+        return ((0,0,0),(a,0,0),(a,a,0),(0,a,0),(0,0,0), (0,0,a),(a,0,a),(a,0,0),(0,0,0), (0,0,a),(0,a,a),(0,a,0), (0,a,a),(a,a,a),(a,a,0), (a,a,a),(a,0,a) )
+
+    def square(self):
+        self.output[('Площадь', 'square')] = (self.input[('Сторона', 'side')] ** 2) * 6
+
+    def volume(self):
+        self.output[('Объём','volume')] = self.input[('Сторона', 'side')] ** 3
+
+    def plot(self):
+        return super().plot(self.coords)

@@ -49,8 +49,7 @@ class Square(Figure):
     def plot(self):
         rd = self.input[('Сторона', 'side')]
         fig = plt.figure()
-        ax = plt.subplot(111)
-        ax.set_aspect('equal')
+        ax = fig.add_subplot(projection='3d')
         x = np.linspace(0,44,int(np.ceil(500*rd)))
         ax.plot(x,np.sqrt(rd**2-x**2),'k')
         ax.plot(x,-np.sqrt(rd**2-x**2),'k')
