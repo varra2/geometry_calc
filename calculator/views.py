@@ -11,7 +11,7 @@ from django.shortcuts import render
 #     template_name = 'home.html'
 
 
-def homePageView(request):
+def home_page_view(request):
 
     classes = Flat.get_types()+Volumetric.get_types()
     fig = classes[0][1]
