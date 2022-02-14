@@ -80,7 +80,9 @@ class Volumetric(Figure):
     def plot(sef, coords=coords):
         fig = plt.figure()
         ax = fig.add_subplot(projection='3d')
-        ax.plot([coord[0] for coord in coords],[coord[1] for coord in coords], [coord[2] for coord in coords], color='teal')
+        x,y,z = [coord[0] for coord in coords],[coord[1] for coord in coords], [coord[2] for coord in coords]
+        ax.set_box_aspect((np.ptp(x), np.ptp(y), np.ptp(z)))
+        ax.plot(x,y,z, color='teal')
         buf = io.BytesIO()
         plt.savefig(buf, format='png')
         buf.seek(0)
@@ -251,6 +253,7 @@ class Circle(Flat):
         super().__init__()
         self.input = {('Радиус','radius'): r}
         super().calculate()
+        self.coords = self.get_coords()
 
     def perimeter(self):
         self.output[('Периметр', 'perimeter')] = 2 * self.input[('Радиус','radius')] * np.pi
@@ -258,20 +261,15 @@ class Circle(Flat):
     def square(self):
         self.output[('Площадь', 'square')] = np.pi * self.input[('Радиус','radius')]**2
 
-    def plot(self):
-        plt.figure()
-        ax = plt.subplot(111)
-        ax.set_aspect('equal')
+    def get_coords(self):
         rd = self.input[('Радиус','radius')]
         x = np.linspace(0,rd*2,int(np.ceil(500*rd)))
-        ax.plot(x, (np.sqrt(rd**2-(x-rd)**2) + rd), color='teal')
-        ax.plot(x, (-np.sqrt(rd**2-(x-rd)**2) + rd), color='teal')
-        buf = io.BytesIO()
-        plt.savefig(buf, format='png')
-        buf.seek(0)
-        thumb_data = base64.b64encode(buf.read()).decode('utf-8') 
-        buf.close()
-        return thumb_data
+        part1 = [(dot, (np.sqrt(rd**2-(dot-rd)**2) + rd)) for dot in x]
+        part2 = [(dot, (-np.sqrt(rd**2-(dot-rd)**2) + rd)) for dot in x]
+        return part1+part2[::-1]
+
+    def plot(self):
+        return super().plot(self.coords)
 
 class Cube(Volumetric):
     title = 'Куб'
@@ -293,6 +291,33 @@ class Cube(Volumetric):
 
     def volume(self):
         self.output[('Объём','volume')] = self.input[('Сторона', 'side')] ** 3
+
+    def plot(self):
+        return super().plot(self.coords)
+
+
+class Parallelepiped(Volumetric):
+    title = 'Параллелепипед'
+    metrics = (('Периметр', 'perimeter'), ('Площадь', 'square'), ('Объём','volume'))
+
+    def __init__(self, a=5, b=3, c=4):
+        super().__init__()
+        self.input = {('Ребро А', 'a_side'): a, ('Ребро Б', 'b_side'): b, ('Ребро В', 'c_side'): c}
+        self.sides = [a,b,c]*4
+        super().calculate()
+        self.coords = self.get_coords()
+
+    def get_coords(self):
+        a,b,c = self.input.values()
+        return ((0,0,0),(a,0,0),(a,b,0),(0,b,0),(0,0,0), (0,0,c),(a,0,c),(a,0,0),(0,0,0), (0,0,c),(0,b,c),(0,b,0), (0,b,c),(a,b,c),(a,b,0), (a,b,c),(a,0,c))
+
+    def square(self):
+        base_squares = (self.input[('Ребро А', 'a_side')] * self.input[('Ребро Б', 'b_side')]) * 2
+        side_squares = (self.input[('Ребро А', 'a_side')] * self.input[('Ребро В', 'c_side')]) * 4
+        self.output[('Площадь', 'square')] = base_squares + side_squares
+
+    def volume(self):
+        self.output[('Объём','volume')] = self.input[('Ребро А', 'a_side')] * self.input[('Ребро Б', 'b_side')] * self.input[('Ребро В', 'c_side')]
 
     def plot(self):
         return super().plot(self.coords)
