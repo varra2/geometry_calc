@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import homePageView, imageResponse
+from .views import homePageView
 
 urlpatterns = [
     #path('', SquareView.as_view(), name='home'),
