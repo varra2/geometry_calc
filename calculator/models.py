@@ -1,6 +1,8 @@
 # coding=utf-8
 
 from django.db import models
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import io
 from PIL import Image
@@ -463,7 +465,6 @@ class Cylinder(Volumetric):
             if i%100 == 0:
                 side += [ccl1[i], ccl2[i]] + ccl2[i:i+100] + [ccl1[i+100]]
 
-        #print(len(x), len(ccl1))
         return ccl1+ccl2+side
 
     def plot(self):
