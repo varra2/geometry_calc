@@ -39,8 +39,4 @@ def homePageView(request):
     context = {"classes": classes ,"type": my_square.title, "params": my_square.input.items(), "results": my_square.output.items(), "picture": figure}
 
     return render(request, "home.html", context=context)
-
-def imageResponse(request):
-
-    return HttpResponse('Hello')
     
