@@ -466,3 +466,42 @@ class Cylinder(Volumetric):
 
     def plot(self):
         return super().plot(self.coords)
+
+class Sphere(Volumetric):
+    title = 'Сфера'
+    metrics = (('Периметр', 'perimeter'), ('Площадь', 'square'), ('Объём','volume'))
+
+    def __init__(self, r=5):
+        super().__init__()
+        self.input = {('Радиус','radius'): r }
+        self.sec = Circle(r)
+        super().calculate()
+
+    def perimeter(self):
+        self.output[('Периметр сечения', 'sec_perimeter')] = self.sec.output[('Периметр', 'perimeter')]
+
+    def square(self):
+        self.output[('Площадь основания', 'base_square')] = self.sec.output[('Площадь', 'square')]
+
+    def volume(self):
+        return (4/3)*np.pi*(self.input[('Радиус','radius')]**3)
+
+    def plot(self):
+
+        rd = self.input[('Радиус','radius')]
+        u = np.linspace(0, 2 * np.pi, 100)
+        v = np.linspace(0, np.pi, 100)
+        x = rd * np.outer(np.cos(u), np.sin(v))
+        y = rd * np.outer(np.sin(u), np.sin(v))
+        z = rd * np.outer(np.ones(np.size(u)), np.cos(v))
+
+        fig = plt.figure()
+        ax = fig.add_subplot(projection='3d')
+        ax.set_box_aspect((np.ptp(x), np.ptp(y), np.ptp(z)))
+        ax.plot_wireframe(x,y,z, color='teal')
+        buf = io.BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
+        thumb_data = base64.b64encode(buf.read()).decode('utf-8') 
+        buf.close()
+        return thumb_data
