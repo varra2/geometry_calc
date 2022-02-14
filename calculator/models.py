@@ -360,6 +360,11 @@ class Pyramid(Volumetric):
         pyr_hight = np.sqrt(face_hight**2 - radius**2)
         self.output[('Высота', 'hight')] = pyr_hight
 
+    def volume(self):
+        hight = self.output[('Высота', 'hight')]
+        base = self.output[('Площадь основания', 'base_square')]
+        self.output[('Объём','volume')] = (1/3)*base*hight
+
 
     def get_coords(self):
         count, length= self.input[('Число сторон основания', 'base_count')], self.input[('Длина стороны основания', 'base_length')]
@@ -373,6 +378,42 @@ class Pyramid(Volumetric):
             alpha += 2*np.pi/count
 
         return coords
+
+    def plot(self):
+        return super().plot(self.coords)
+
+class Cone(Volumetric):
+    title = 'Конус'
+    metrics = (('Периметр', 'perimeter'), ('Площадь', 'square'), ('Объём','volume'))
+
+    def __init__(self, h = 8, r = 4):
+        super().__init__()
+        self.input = {('Высота', 'hight'): h, ('Радиус','radius'): r }
+        self.base = Circle(r)
+
+        super().calculate()
+        self.coords = self.get_coords()
+
+    def square(self):
+        self.output[('Площадь основания', 'base_square')] = self.base.output[('Площадь', 'square')]
+
+    def volume(self):
+        base = self.output[('Площадь основания', 'base_square')]
+        hight = self.input[('Высота', 'hight')]
+        self.output[('Объём','volume')] = (1/3)*base*hight
+    
+    def get_coords(self):
+        rd = self.input[('Радиус','radius')]
+        h = self.input[('Высота', 'hight')]
+        x = np.linspace(0,rd*2,int(np.ceil(500*rd)))
+        part1 = [(dot, (np.sqrt(rd**2-(dot-rd)**2) + rd),0) for dot in x]
+        part2 = [(dot, (-np.sqrt(rd**2-(dot-rd)**2) + rd),0) for dot in x]
+        ccl = part1+part2[::-1]
+        cone = []
+        net = np.linspace(0,rd*2,rd*5)
+        for dot in net:
+            cone += [(rd,rd,h), (dot, (np.sqrt(rd**2-(dot-rd)**2) + rd),0), (rd,rd,h), (dot, (-np.sqrt(rd**2-(dot-rd)**2) + rd),0), (rd,rd,h)]
+        return ccl+cone
 
     def plot(self):
         return super().plot(self.coords)
