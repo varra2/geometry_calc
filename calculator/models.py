@@ -321,3 +321,58 @@ class Parallelepiped(Volumetric):
 
     def plot(self):
         return super().plot(self.coords)
+
+class Pyramid(Volumetric):
+    title = 'Пирамида (правильная)'
+    metrics = (('Высота', 'hight'), ('Периметр', 'perimeter'), ('Площадь', 'square'), ('Объём','volume'))
+
+    def __init__(self, c=4, l = 5, e=6):
+        super().__init__()
+        self.input = {('Число сторон основания', 'base_count'): c, ('Длина стороны основания', 'base_length'): l, ('Ребро', 'edge'): e}
+        self.face = Triangle(l,e,e)
+        try:
+            super().calculate()
+            self.coords = self.get_coords()
+        except:
+            self.coords = super().coords
+            self.output = {('Ошибка','error'): 'Невозможно построить пирамиду с данным набором параметров. Пожалуста, попробуте ещё раз.'}
+
+    def perimeter(self):
+        count, length, edge = self.input.values()
+        self.output[('Периметр основания', 'base_perimeter')] = count * length
+        self.output[('Общий периметр', 'perimeter')] = count * (length + edge)
+
+    def square(self):
+        count, length= self.input[('Число сторон основания', 'base_count')], self.input[('Длина стороны основания', 'base_length')]
+        base_square = (count * (length**2)) / (4 * np.tan(np.pi/count))
+        face_square = self.face.output[('Площадь', 'square')]
+        self.output[('Площадь основания', 'base_square')] = base_square
+        self.output[('Общий периметр', 'perimeter')] = base_square + face_square*count
+
+    def hight(self):
+        count, length= self.input[('Число сторон основания', 'base_count')], self.input[('Длина стороны основания', 'base_length')]
+
+        face_hight = self.face.output[('Высота', 'hight')]
+        self.output[('Апофема', 'face_square')] = face_hight
+
+        alpha = np.pi/count
+        radius = (length/2) * np.arctan(alpha)
+        pyr_hight = np.sqrt(face_hight**2 - radius**2)
+        self.output[('Высота', 'hight')] = pyr_hight
+
+
+    def get_coords(self):
+        count, length= self.input[('Число сторон основания', 'base_count')], self.input[('Длина стороны основания', 'base_length')]
+        alpha = 2*np.pi/count
+        radius = (length/2) * (1 / np.sin(alpha/2))
+        hight = self.output[('Высота', 'hight')]
+        coords = [(0,0,hight),(radius, 0, 0)]
+        
+        for vertex in range(count):
+            coords += [(np.cos(alpha)*radius, np.sin(alpha)*radius, 0), (0,0, hight), (np.cos(alpha)*radius, np.sin(alpha)*radius, 0)]
+            alpha += 2*np.pi/count
+
+        return coords
+
+    def plot(self):
+        return super().plot(self.coords)
