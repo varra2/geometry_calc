@@ -23,29 +23,29 @@ class Figure():
 
     def calculate(self):
         if ('Периметр', 'perimeter') in self.metrics:
-            self.perimeter()
+            self.get_perimeter()
         if ('Площадь', 'square') in self.metrics:
-            self.square()
+            self.get_square()
         if ('Высота', 'hight') in self.metrics:
-            self.hight()
+            self.get_hight()
         if ('Сторона','side') in self.metrics:
             self.get_sides()
         if ('Объём','volume') in self.metrics:
-            self.volume()
+            self.get_volume()
 
-    def perimeter(self):
+    def get_perimeter(self):
         self.output[('Периметр', 'perimeter')] = sum(self.sides)
 
-    def square(self):
+    def get_square(self):
         pass
 
-    def hight(self):
+    def get_hight(self):
         pass
 
     def get_sides(self):
         pass
 
-    def volume(self):
+    def get_volume(self):
         pass
 
     @classmethod
@@ -103,14 +103,14 @@ class Square(Flat):
         #self.coords = ((0,0),(a,0),(a,a),(0,a),(0,0))
         self.input[('Сторона', 'side')] = a
         self.sides = [a]*4
-        super().calculate()
+        self.calculate()
         self.coords = self.get_coords()
 
     def get_coords(self):
         a = self.input[('Сторона', 'side')]
         return ((0,0),(a,0),(a,a),(0,a),(0,0))
 
-    def square(self):
+    def get_square(self):
         self.output[('Площадь', 'square')] = self.input[('Сторона', 'side')] ** 2
 
     def plot(self):
@@ -125,14 +125,14 @@ class Rectangle(Flat):
             self.input = {('Сторона А', 'a_side'): a, ('Сторона Б', 'b_side'): b}
             self.coords = self.get_coords()
             self.sides = [a,b]*2
-            super().calculate()
+            self.calculate()
 
         def get_coords(self):
             a = self.input[('Сторона А', 'a_side')]
             b = self.input[('Сторона Б', 'b_side')]
             return ((0,0),(b,0),(b,a),(0,a),(0,0))
 
-        def square(self):
+        def get_square(self):
             self.output[('Площадь', 'square')] = self.input[('Сторона А', 'a_side')] * self.input[('Сторона Б', 'b_side')]
     
         def plot(self):
@@ -147,20 +147,20 @@ class Triangle(Flat):
             self.input = {('Сторона А', 'a_side'): a, ('Сторона Б', 'b_side'): b, ('Сторона В', 'c_side'): c}
             self.sides = [a,b,c]
             if not self.triangle_rule(a,b,c):
-                super().calculate()
+                self.calculate()
                 self.coords = self.get_coords()
             else:
                 self.output[('Ошибка','error')] = self.triangle_rule(a,b,c)
                 self.coords = super().coords
 
-        def hight(self):
+        def get_hight(self):
             a,b,c = self.sides[:]
             p = (a + b + c)/2
             h = 2/a * np.sqrt(p * (p - a) * (p - b) * (p - c))
             self.output[('Высота', 'hight')] = h
             return h
 
-        def square(self):            
+        def get_square(self):            
             self.output[('Площадь', 'square')] = (self.sides[0] * self.hight())/2
 
         def get_coords(self):
@@ -193,7 +193,7 @@ class Trapezoid(Flat):
             if not check:
                 d = np.sqrt((a - leg)**2 + h**2)
                 self.sides = [a,b,c,d]
-                super().calculate()
+                self.calculate()
                 self.coords = self.get_coords()
             else:
                 self.coords = super().coords
@@ -211,7 +211,7 @@ class Trapezoid(Flat):
         h = self.input[('Высота', 'hight')]
         return ((0,0), (np.sqrt(b**2 - h**2), h), (c + np.sqrt(b**2 - h**2), h), (a,0), (0,0))
 
-    def square(self):
+    def get_square(self):
         base1, base2, h = self.input[('Нижнее основание', 'low_base')], self.input[('Верхнее основание', 'high_base')], self.input[('Высота', 'hight')] 
         self.output[('Площадь', 'square')] = (base1 + base2)*h/2
         
@@ -229,7 +229,7 @@ class Rhomb(Flat):
             super().__init__()
             self.input = {('Большая диагональ', 'bg_diagonal'): max(d1, d2), ('Малая диагональ', 'sm_diagonal'): min(d1,d2)}
             self.sides = self.get_sides()
-            super().calculate()
+            self.calculate()
             self.coords = self.get_coords()
 
     def get_sides(self):
@@ -237,7 +237,7 @@ class Rhomb(Flat):
         self.output[('Сторона','side')] = np.sqrt((d1/2)**2 + (d2/2)**2)
         return [np.sqrt((d1/2)**2 + (d2/2)**2)]*4
 
-    def square(self):
+    def get_square(self):
         a,b,c = self.output[('Сторона','side')], self.input[('Большая диагональ', 'bg_diagonal')], self.input[('Малая диагональ', 'sm_diagonal')]
         triangle = Triangle(b/2,c/2,a)
         self.output[('Площадь', 'square')] = triangle.output[('Площадь', 'square')]*4
@@ -256,13 +256,13 @@ class Circle(Flat):
     def __init__(self, r=5):
         super().__init__()
         self.input = {('Радиус','radius'): r}
-        super().calculate()
+        self.calculate()
         self.coords = self.get_coords()
 
-    def perimeter(self):
+    def get_perimeter(self):
         self.output[('Периметр', 'perimeter')] = 2 * self.input[('Радиус','radius')] * np.pi
 
-    def square(self):
+    def get_square(self):
         self.output[('Площадь', 'square')] = np.pi * self.input[('Радиус','radius')]**2
 
     def get_coords(self):
@@ -283,17 +283,17 @@ class Cube(Volumetric):
         super().__init__()
         self.input[('Сторона', 'side')] = a
         self.sides = [a]*12
-        super().calculate()
+        self.calculate()
         self.coords = self.get_coords()
 
     def get_coords(self):
         a = self.input[('Сторона', 'side')]
         return ((0,0,0),(a,0,0),(a,a,0),(0,a,0),(0,0,0), (0,0,a),(a,0,a),(a,0,0),(0,0,0), (0,0,a),(0,a,a),(0,a,0), (0,a,a),(a,a,a),(a,a,0), (a,a,a),(a,0,a) )
 
-    def square(self):
+    def get_square(self):
         self.output[('Площадь', 'square')] = (self.input[('Сторона', 'side')] ** 2) * 6
 
-    def volume(self):
+    def get_volume(self):
         self.output[('Объём','volume')] = self.input[('Сторона', 'side')] ** 3
 
     def plot(self):
@@ -308,19 +308,19 @@ class Parallelepiped(Volumetric):
         super().__init__()
         self.input = {('Ребро А', 'a_side'): a, ('Ребро Б', 'b_side'): b, ('Ребро В', 'c_side'): c}
         self.sides = [a,b,c]*4
-        super().calculate()
+        self.calculate()
         self.coords = self.get_coords()
 
     def get_coords(self):
         a,b,c = self.input.values()
         return ((0,0,0),(a,0,0),(a,b,0),(0,b,0),(0,0,0), (0,0,c),(a,0,c),(a,0,0),(0,0,0), (0,0,c),(0,b,c),(0,b,0), (0,b,c),(a,b,c),(a,b,0), (a,b,c),(a,0,c))
 
-    def square(self):
+    def get_square(self):
         base_squares = (self.input[('Ребро А', 'a_side')] * self.input[('Ребро Б', 'b_side')]) * 2
         side_squares = (self.input[('Ребро А', 'a_side')] * self.input[('Ребро В', 'c_side')]) * 4
         self.output[('Площадь', 'square')] = base_squares + side_squares
 
-    def volume(self):
+    def get_volume(self):
         self.output[('Объём','volume')] = self.input[('Ребро А', 'a_side')] * self.input[('Ребро Б', 'b_side')] * self.input[('Ребро В', 'c_side')]
 
     def plot(self):
@@ -335,25 +335,25 @@ class Pyramid(Volumetric):
         self.input = {('Число сторон основания', 'base_count'): c, ('Длина стороны основания', 'base_length'): l, ('Ребро', 'edge'): e}
         self.face = Triangle(l,e,e)
         try:
-            super().calculate()
+            self.calculate()
             self.coords = self.get_coords()
         except:
             self.coords = super().coords
             self.output = {('Ошибка','error'): 'Невозможно построить пирамиду с данным набором параметров. Пожалуста, попробуте ещё раз.'}
 
-    def perimeter(self):
+    def get_perimeter(self):
         count, length, edge = self.input.values()
         self.output[('Периметр основания', 'base_perimeter')] = count * length
         self.output[('Общий периметр', 'perimeter')] = count * (length + edge)
 
-    def square(self):
+    def get_square(self):
         count, length= self.input[('Число сторон основания', 'base_count')], self.input[('Длина стороны основания', 'base_length')]
         base_square = (count * (length**2)) / (4 * np.tan(np.pi/count))
         face_square = self.face.output[('Площадь', 'square')]
         self.output[('Площадь основания', 'base_square')] = base_square
         self.output[('Общий периметр', 'perimeter')] = base_square + face_square*count
 
-    def hight(self):
+    def get_hight(self):
         count, length= self.input[('Число сторон основания', 'base_count')], self.input[('Длина стороны основания', 'base_length')]
 
         face_hight = self.face.output[('Высота', 'hight')]
@@ -364,7 +364,7 @@ class Pyramid(Volumetric):
         pyr_hight = np.sqrt(face_hight**2 - radius**2)
         self.output[('Высота', 'hight')] = pyr_hight
 
-    def volume(self):
+    def get_volume(self):
         hight = self.output[('Высота', 'hight')]
         base = self.output[('Площадь основания', 'base_square')]
         self.output[('Объём','volume')] = (1/3)*base*hight
@@ -395,16 +395,16 @@ class Cone(Volumetric):
         self.input = {('Высота', 'hight'): h, ('Радиус','radius'): r }
         self.base = Circle(r)
 
-        super().calculate()
+        self.calculate()
         self.coords = self.get_coords()
 
-    def perimeter(self):
+    def get_perimeter(self):
         self.output[('Периметр основания', 'base_perimeter')] = self.base.output[('Периметр', 'perimeter')]
 
-    def square(self):
+    def get_square(self):
         self.output[('Площадь основания', 'base_square')] = self.base.output[('Площадь', 'square')]
 
-    def volume(self):
+    def get_volume(self):
         base = self.output[('Площадь основания', 'base_square')]
         hight = self.input[('Высота', 'hight')]
         self.output[('Объём','volume')] = (1/3)*base*hight
@@ -434,16 +434,16 @@ class Cylinder(Volumetric):
         self.input = {('Высота', 'hight'): h, ('Радиус','radius'): r }
         self.base = Circle(r)
 
-        super().calculate()
+        self.calculate()
         self.coords = self.get_coords()
 
-    def perimeter(self):
+    def get_perimeter(self):
         self.output[('Периметр основания', 'base_perimeter')] = self.base.output[('Периметр', 'perimeter')]
 
-    def square(self):
+    def get_square(self):
         self.output[('Площадь основания', 'base_square')] = self.base.output[('Площадь', 'square')]
 
-    def volume(self):
+    def get_volume(self):
         base = self.output[('Площадь основания', 'base_square')]
         hight = self.input[('Высота', 'hight')]
         self.output[('Объём','volume')] = base*hight
@@ -478,15 +478,15 @@ class Sphere(Volumetric):
         super().__init__()
         self.input = {('Радиус','radius'): r }
         self.sec = Circle(r)
-        super().calculate()
+        self.calculate()
 
-    def perimeter(self):
+    def get_perimeter(self):
         self.output[('Периметр сечения', 'sec_perimeter')] = self.sec.output[('Периметр', 'perimeter')]
 
-    def square(self):
+    def get_square(self):
         self.output[('Площадь основания', 'base_square')] = self.sec.output[('Площадь', 'square')]
 
-    def volume(self):
+    def get_volume(self):
         return (4/3)*np.pi*(self.input[('Радиус','radius')]**3)
 
     def plot(self):

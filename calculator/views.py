@@ -1,21 +1,14 @@
-#from django.shortcuts import render
 from urllib import response
-
 from django.http import HttpResponse
 from .models import *
-#from django.views.generic.base import TemplateView
 from django.shortcuts import render
-
-# class SquareView(TemplateView):
-#     model = Square
-#     template_name = 'home.html'
 
 
 def home_page_view(request):
 
     classes = Flat.get_types()+Volumetric.get_types()
     fig = classes[0][1]
-    t = None
+    t = []
 
     if request.method == "GET":
         print(request.GET.get('type',''))
@@ -29,14 +22,10 @@ def home_page_view(request):
                 fig = type[1]
         t = [int(request.POST[item]) for item in request.POST if not (item == 'csrfmiddlewaretoken' or item =='title')] 
 
-    #my_square = Square(x)
-    if t:
-        my_square = fig(*t)
-    else:
-        my_square = fig()
-    #my_square = Triangle()
-    figure = my_square.plot()
-    context = {"classes": classes ,"type": my_square.title, "params": my_square.input.items(), "results": my_square.output.items(), "picture": figure}
+    my_figure = fig(*t)
+
+    figure = my_figure.plot()
+    context = {"classes": classes ,"type": my_figure.title, "params": my_figure.input.items(), "results": my_figure.output.items(), "picture": figure}
 
     return render(request, "home.html", context=context)
     
