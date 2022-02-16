@@ -1,11 +1,9 @@
 # coding=utf-8
 
-from django.db import models
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import io
-from PIL import Image
 import base64
 import numpy as np
 
