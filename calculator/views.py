@@ -1,5 +1,3 @@
-from urllib import response
-from django.http import HttpResponse
 from .models import *
 from django.shortcuts import render
 

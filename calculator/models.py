@@ -161,7 +161,7 @@ class Triangle(Flat):
             return h
 
         def get_square(self):            
-            self.output[('Площадь', 'square')] = (self.sides[0] * self.hight())/2
+            self.output[('Площадь', 'square')] = (self.sides[0] * self.get_hight())/2
 
         def get_coords(self):
             a,b = self.sides[0], self.sides[1]
