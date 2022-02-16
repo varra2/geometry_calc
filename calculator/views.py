@@ -6,7 +6,7 @@ def home_page_view(request):
 
     classes = Flat.get_types() + Volumetric.get_types()
     fig = classes[0][1]
-    t = []
+    t = ()
 
     if request.method == "GET":
         print(request.GET.get("type", ""))
